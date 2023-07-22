@@ -4,6 +4,8 @@ import { Pause, PlayArrow, VolumeUp } from "@mui/icons-material";
 import styles from "../styles/Player.module.scss";
 import { ITrack } from "@/types/track";
 import TrackProgress from "@/components/TrackProgress";
+import { useTypedSelector } from "@/hooks/useTypedSelector";
+import { useActions } from "@/hooks/useActions";
 
 const Player: FC = () => {
   const track: ITrack = {
@@ -16,11 +18,22 @@ const Player: FC = () => {
     picture: "http://localhost:5000/image/1.jpg",
     comments: [],
   };
-  const active = false;
+  const { active, duration, currentTime, volume, pause } = useTypedSelector(
+    (state) => state.player
+  );
+  const { playTrack, pauseTrack } = useActions();
+  const play = () => {
+    if (pause) {
+      playTrack();
+    } else {
+      pauseTrack();
+    }
+  };
+
   return (
     <div className={styles.player}>
-      <IconButton onClick={(e) => e.stopPropagation()}>
-        {active ? <Pause /> : <PlayArrow />}
+      <IconButton onClick={play}>
+        {pause ? <PlayArrow /> : <Pause />}
       </IconButton>
       <Grid
         container
