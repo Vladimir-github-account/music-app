@@ -15,7 +15,7 @@ const Index = () => {
       text: "song text",
       listens: 5,
       audio: "http://localhost:5000/audio/1.mp3",
-      picture: "http://localhost:5000/image/1.mp3",
+      picture: "http://localhost:5000/image/1.jpg",
       comments: [],
     },
     {
@@ -25,7 +25,7 @@ const Index = () => {
       text: "song text",
       listens: 5,
       audio: "http://localhost:5000/audio/2.mp3",
-      picture: "http://localhost:5000/image/2.mp3",
+      picture: "http://localhost:5000/image/2.jpg",
       comments: [],
     },
   ];
