@@ -1,34 +1,65 @@
-import React, { FC } from "react";
+import React, { ChangeEvent, FC, useEffect } from "react";
 import { Grid, IconButton } from "@mui/material";
 import { Pause, PlayArrow, VolumeUp } from "@mui/icons-material";
 import styles from "../styles/Player.module.scss";
-import { ITrack } from "@/types/track";
 import TrackProgress from "@/components/TrackProgress";
 import { useTypedSelector } from "@/hooks/useTypedSelector";
 import { useActions } from "@/hooks/useActions";
+import { setVolume } from "@/store/action-creators/player";
+
+let audio;
 
 const Player: FC = () => {
-  const track: ITrack = {
-    _id: "1",
-    name: "Track #1",
-    artist: "Artist #1",
-    text: "song text",
-    listens: 5,
-    audio: "http://localhost:5000/audio/1.mp3",
-    picture: "http://localhost:5000/image/1.jpg",
-    comments: [],
-  };
   const { active, duration, currentTime, volume, pause } = useTypedSelector(
     (state) => state.player
   );
-  const { playTrack, pauseTrack } = useActions();
+  const { playTrack, pauseTrack, setVolume, setDuration, setCurrentTime } =
+    useActions();
+
+  useEffect(() => {
+    if (!audio) {
+      audio = new Audio();
+    } else {
+      setAudio();
+      play();
+    }
+  }, [active]);
+
+  const setAudio = () => {
+    if (active) {
+      audio.src = "http://localhost:5000/" + active.audio;
+      audio.volume = volume / 100;
+      audio.onloadedmetadata = () => {
+        setDuration(Math.ceil(audio.duration));
+      };
+      audio.ontimeupdate = () => {
+        setCurrentTime(Math.ceil(audio.currentTime));
+      };
+    }
+  };
+
   const play = () => {
     if (pause) {
       playTrack();
+      audio.play();
     } else {
       pauseTrack();
+      audio.pause();
     }
   };
+
+  const changeVolume = (e: ChangeEvent<HTMLInputElement>) => {
+    audio.volume = Number(e.target.value) / 100;
+    setVolume(Number(e.target.value));
+  };
+  const changeCurrentTime = (e: ChangeEvent<HTMLInputElement>) => {
+    audio.currentTime = Number(e.target.value);
+    setCurrentTime(Number(e.target.value));
+  };
+
+  if (!active) {
+    return null;
+  }
 
   return (
     <div className={styles.player}>
@@ -40,12 +71,16 @@ const Player: FC = () => {
         direction="column"
         style={{ width: 200, margin: "0 20px" }}
       >
-        <div>{track.name}</div>
-        <div style={{ fontSize: 12, color: "gray" }}>{track.artist}</div>
+        <div>{active?.name}</div>
+        <div style={{ fontSize: 12, color: "gray" }}>{active?.artist}</div>
       </Grid>
-      <TrackProgress left={0} right={100} onChange={() => ({})} />
+      <TrackProgress
+        left={currentTime}
+        right={duration}
+        onChange={changeCurrentTime}
+      />
       <VolumeUp style={{ marginLeft: "auto" }} />
-      <TrackProgress left={0} right={100} onChange={() => ({})} />
+      <TrackProgress left={volume} right={100} onChange={changeVolume} />
     </div>
   );
 };
