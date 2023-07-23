@@ -12,7 +12,7 @@ const Index = () => {
   const { tracks, error } = useTypedSelector((state) => state.track);
   if (error) {
     return (
-      <MainLayout>
+      <MainLayout title="Track list - Music App">
         <h2>{error}</h2>
       </MainLayout>
     );

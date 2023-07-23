@@ -30,7 +30,10 @@ const TrackPage: FC = ({ serverTrack }) => {
   };
 
   return (
-    <MainLayout>
+    <MainLayout
+      title={`${track.name} - song and lyrics by ${track.artist} | Music app`}
+      keywords={`song, track, artist, ${track.name}, ${track.artist}`}
+    >
       <Button
         variant="outlined"
         style={{ fontSize: 32 }}
