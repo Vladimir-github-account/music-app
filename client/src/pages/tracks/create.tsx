@@ -3,11 +3,18 @@ import MainLayout from "@/layouts/MainLayout";
 import StepWrapper from "../../components/StepWrapper";
 import { Button, Grid, TextField } from "@mui/material";
 import FileUpload from "@/components/FileUpload";
+import { useInput } from "../../hooks/useInput";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 const Create = () => {
   const [activeStep, setActiveStep] = useState(0);
-  const [picture, setPicture] = useState(null);
-  const [audio, setAudio] = useState(null);
+  const [picture, setPicture] = useState<any>(null);
+  const [audio, setAudio] = useState<any>(null);
+  const name = useInput("");
+  const artist = useInput("");
+  const text = useInput("");
+  const router = useRouter();
   const prev = () => {
     setActiveStep((prev) => prev - 1);
   };
@@ -15,6 +22,17 @@ const Create = () => {
   const next = () => {
     if (activeStep !== 2) {
       setActiveStep((prev) => prev + 1);
+    } else {
+      const formData = new FormData();
+      formData.append("name", name.value);
+      formData.append("text", text.value);
+      formData.append("artist", artist.value);
+      formData.append("picture", picture);
+      formData.append("audio", audio);
+      axios
+        .post("http://localhost:5000/tracks", formData)
+        .then((res) => router.push("/tracks"))
+        .catch((e) => console.log(e));
     }
   };
 
@@ -23,9 +41,14 @@ const Create = () => {
       <StepWrapper activeStep={activeStep}>
         {activeStep === 0 && (
           <Grid container direction="column" style={{ padding: 20 }}>
-            <TextField style={{ marginTop: 10 }} label="Track title" />
-            <TextField style={{ marginTop: 10 }} label="Artist" />
             <TextField
+              {...name}
+              style={{ marginTop: 10 }}
+              label="Track title"
+            />
+            <TextField {...artist} style={{ marginTop: 10 }} label="Artist" />
+            <TextField
+              {...text}
               style={{ marginTop: 10 }}
               label="Lyrics"
               multiline
